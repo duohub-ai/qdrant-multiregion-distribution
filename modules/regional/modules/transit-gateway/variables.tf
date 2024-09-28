@@ -1,3 +1,5 @@
+# modules/regional/modules/transit-gateway/variables.tf
+
 variable "region" {
   description = "AWS Region"
   type        = string
