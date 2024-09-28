@@ -1,0 +1,4 @@
+
+locals {
+  profile = "hai"
+}
