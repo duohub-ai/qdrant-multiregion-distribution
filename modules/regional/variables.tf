@@ -49,3 +49,13 @@ variable "tgw_peering_attachment_ids" {
   description = "Map of region names to their TGW peering attachment IDs"
   type        = map(string)
 }
+
+variable "task_role_arn" {
+  description = "ARN of the task role"
+  type        = string
+}
+
+variable "task_policy_arn" {
+  description = "ARN of the task policy"
+  type        = string
+}
