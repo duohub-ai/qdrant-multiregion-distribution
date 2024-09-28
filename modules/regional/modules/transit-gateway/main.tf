@@ -17,25 +17,30 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "tgw_attachment" {
   transit_gateway_id = aws_ec2_transit_gateway.tgw.id
   vpc_id             = var.vpc_id
 
+  depends_on = [
+    aws_ec2_transit_gateway.tgw
+  ]
+
   tags = {
     Name = "${var.organisation}-tgw-attachment-${var.region}"
   }
 }
 
-resource "aws_ec2_transit_gateway_route_table" "tgw_route_table" {
-  transit_gateway_id = aws_ec2_transit_gateway.tgw.id
+data "aws_ec2_transit_gateway_route_table" "default" {
+  filter {
+    name   = "transit-gateway-id"
+    values = [aws_ec2_transit_gateway.tgw.id]
+  }
 
-  tags = {
-    Name = "${var.organisation}-tgw-rt-${var.region}"
+  filter {
+    name   = "default-association-route-table"
+    values = ["true"]
   }
 }
 
-resource "aws_ec2_transit_gateway_route_table_association" "tgw_route_table_assoc" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.tgw_attachment.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table.id
-}
-
-resource "aws_ec2_transit_gateway_route_table_propagation" "tgw_route_propagation" {
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_vpc_attachment.tgw_attachment.id
-  transit_gateway_route_table_id = aws_ec2_transit_gateway_route_table.tgw_route_table.id
+# Add a name tag to the default route table
+resource "aws_ec2_tag" "tgw_route_table_name" {
+  resource_id = data.aws_ec2_transit_gateway_route_table.default.id
+  key         = "Name"
+  value       = "${var.organisation}-tgw-rt-${var.region}"
 }
