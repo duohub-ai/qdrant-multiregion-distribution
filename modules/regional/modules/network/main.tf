@@ -34,20 +34,17 @@ resource "aws_route_table" "main" {
     gateway_id = aws_internet_gateway.main.id
   }
 
+  dynamic "route" {
+    for_each = var.tgw_routes
+    content {
+      cidr_block         = route.value.destination_cidr_block
+      transit_gateway_id = route.value.transit_gateway_id
+    }
+  }
+
   tags = {
     Name = var.route_table_name
   }
-}
-
-resource "aws_route" "tgw_routes" {
-  count = length([
-    for route in var.tgw_routes :
-    route if route.destination_cidr_block != var.region_cidr_blocks[var.region]
-  ])
-
-  route_table_id         = aws_route_table.main.id
-  destination_cidr_block = var.tgw_routes[count.index].destination_cidr_block
-  transit_gateway_id     = var.tgw_routes[count.index].transit_gateway_id
 }
 
 resource "aws_route_table_association" "main" {

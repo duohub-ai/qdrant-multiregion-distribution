@@ -43,34 +43,20 @@ module "transit_gateway" {
   organisation = var.organisation
   vpc_id       = module.network.vpc_id
   subnet_ids   = module.network.subnet_ids
+  other_region_cidr_blocks     = var.other_region_cidr_blocks
+  tgw_peering_attachment_ids   = var.tgw_peering_attachment_ids
 }
 
-
- resource "aws_ec2_transit_gateway_route" "tgw_routes" {
-   for_each = {
-     for region, cidr in var.other_region_cidr_blocks : 
-     region => cidr if region != var.region
-   }
-   
-   depends_on = [
-     module.transit_gateway
-   ]
+ module "qdrant" {
+   source = "./modules/qdrant"
  
-   destination_cidr_block         = each.value
-   transit_gateway_attachment_id  = var.tgw_peering_attachment_ids[each.key]
-   transit_gateway_route_table_id = module.transit_gateway.transit_gateway_route_table_id
+   region                  = var.region
+   organisation            = var.organisation
+   vpc_id                  = data.aws_vpc.selected.id
+   subnet_ids              = module.network.subnet_ids
+   security_group_id       = data.aws_security_group.security-group.id
+   task_role_arn           = var.task_role_arn
+   execution_role_arn      = var.task_policy_arn
+   namespace               = "qdrant-${var.region}"
+   service_discovery_name  = "qdrant-${var.region}"
  }
-
-module "qdrant" {
-  source = "./modules/qdrant"
-
-  region                  = var.region
-  organisation            = var.organisation
-  vpc_id                  = data.aws_vpc.selected.id
-  subnet_ids              = module.network.subnet_ids
-  security_group_id       = data.aws_security_group.security-group.id
-  task_role_arn           = var.task_role_arn
-  execution_role_arn      = var.task_policy_arn
-  namespace               = "qdrant-${var.region}"
-  service_discovery_name  = "qdrant-${var.region}"
-}
