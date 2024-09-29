@@ -30,6 +30,9 @@ Please note, this repo does not cover EFS. It is assumed that you will add an EF
     - [Edit backend.conf](#edit-backendconf)
     - [Plan \& Apply - First Create](#plan--apply---first-create)
     - [Plan \& Apply - Subsequent Creates](#plan--apply---subsequent-creates)
+  - [Development](#development)
+    - [Hardcoded Values](#hardcoded-values)
+    - [Adding Additional Services](#adding-additional-services)
   - [Setting up through the console](#setting-up-through-the-console)
     - [Step 1. Create new VPCs in your preferred regions with different CIDR blocks.](#step-1-create-new-vpcs-in-your-preferred-regions-with-different-cidr-blocks)
     - [Step 2. Create a new security group for each VPC that either allows all traffic or allows traffic on ports 80, 443, 6333, 6334, 6335 from anywhere. Optionally, allow all traffic from within the VPC CIDR](#step-2-create-a-new-security-group-for-each-vpc-that-either-allows-all-traffic-or-allows-traffic-on-ports-80-443-6333-6334-6335-from-anywhere-optionally-allow-all-traffic-from-within-the-vpc-cidr)
@@ -126,6 +129,48 @@ Additionally, it prevents the `/modules/regional/modules/qdrant` module from try
 ```bash
 terraform plan -var="stage=dev"
 terraform apply -var="stage=dev"
+```
+
+## Development
+
+### Hardcoded Values
+
+Please note, there is one location where values are hardcoded. 
+
+`modules/regional/main.tf`
+
+Since primary cluster is in `eu-west-2`, all secondary clusters need to bootstrap from the primary. 
+```hcl
+module "qdrant" {
+  source = "./modules/qdrant"
+ ...
+  primary_service_discovery_name = "qdrant-test-qdrant-eu-west-2"
+  primary_namespace_name        = "qdrant-test.eu-west-2.internal"
+}
+```
+
+### Adding Additional Services
+
+You may find yourself in a position where you need to add additional services to your clusters that use the same regional private DNS namespace. 
+
+If this is the case, you can define multiple `service_discovery_$[name}` modules in `/modules/regional/main.tf`, for example: 
+
+```hcl 
+module "service_discovery_qdrant" {
+  source         = "./modules/service-discovery"
+  organisation   = var.organisation
+  region         = var.region
+  namespace_id = module.namespace.namespace_id
+  service_name = "${var.organisation}-qdrant-${var.region}"
+}
+
+module "service_discovery_falkordb" {
+  source         = "./modules/service-discovery"
+  organisation   = var.organisation
+  region         = var.region
+  namespace_id = module.namespace.namespace_id
+  service_name = "${var.organisation}-falkordb-${var.region}"
+}
 ```
 
 ## Setting up through the console 
