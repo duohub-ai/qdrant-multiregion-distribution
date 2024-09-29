@@ -35,7 +35,7 @@ Please note, this repo does not cover EFS. It is assumed that you will add an EF
     - [Adding Additional Services](#adding-additional-services)
   - [Setting up through the console](#setting-up-through-the-console)
     - [Step 1. Create new VPCs in your preferred regions with different CIDR blocks.](#step-1-create-new-vpcs-in-your-preferred-regions-with-different-cidr-blocks)
-    - [Step 2. Create a new security group for each VPC that either allows all traffic or allows traffic on ports 80, 443, 6333, 6334, 6335 from anywhere. Optionally, allow all traffic from within the VPC CIDR](#step-2-create-a-new-security-group-for-each-vpc-that-either-allows-all-traffic-or-allows-traffic-on-ports-80-443-6333-6334-6335-from-anywhere-optionally-allow-all-traffic-from-within-the-vpc-cidr)
+    - [Step 2. Create a new security group for each VPC](#step-2-create-a-new-security-group-for-each-vpc)
     - [Step 3: Create a Transit Gateway](#step-3-create-a-transit-gateway)
     - [Step 4: Create Transit Gateway Attachments](#step-4-create-transit-gateway-attachments)
     - [Step 5: Update VPC Route Tables](#step-5-update-vpc-route-tables)
@@ -192,7 +192,9 @@ variable "region_cidr_blocks" {
 ```
 
 
-### Step 2. Create a new security group for each VPC that either allows all traffic or allows traffic on ports 80, 443, 6333, 6334, 6335 from anywhere. Optionally, allow all traffic from within the VPC CIDR
+### Step 2. Create a new security group for each VPC 
+
+Ensure your security group either allows all traffic or allows traffic on ports 80, 443, 6333, 6334, 6335 from anywhere. Optionally, allow all traffic from within the VPC CIDR.
 
 
 ### Step 3: Create a Transit Gateway
