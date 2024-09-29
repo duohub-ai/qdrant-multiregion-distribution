@@ -17,7 +17,7 @@ resource "aws_iam_role" "ecs_task_role" {
 
 resource "aws_iam_policy" "ecs_task_policy" {
   name        = var.policy_name
-  description = "Policy for ECS task role to access ECR, DynamoDB, S3, and Service Discovery"
+  description = "Policy for ECS task role to access ECR, DynamoDB, S3, Service Discovery, and CloudWatch Logs"
   policy = jsonencode({
     Version = "2012-10-17",
     Statement = [
@@ -49,6 +49,16 @@ resource "aws_iam_policy" "ecs_task_policy" {
           "route53:UpdateHealthCheck"
         ],
         Resource = "*"
+      },
+      {
+        Effect = "Allow",
+        Action = [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "logs:DescribeLogStreams"
+        ],
+        Resource = "arn:aws:logs:*:*:*"
       }
     ]
   })

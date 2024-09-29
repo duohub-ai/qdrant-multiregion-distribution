@@ -65,6 +65,8 @@ module "eu-west-2" {
   region                    = "eu-west-2"
   organisation              = var.organisation
   primary                   = true
+  task_role_arn             = module.global.ecs_task_role_arn
+  task_policy_arn           = module.global.ecs_task_policy_arn
   other_region_cidr_blocks  = {
     for region, cidr in var.region_cidr_blocks : region => cidr if region != "eu-west-2"
   }
@@ -83,6 +85,8 @@ module "us-east-1" {
   region                    = "us-east-1"
   organisation              = var.organisation
   primary                   = false
+  task_role_arn             = module.global.ecs_task_role_arn
+  task_policy_arn           = module.global.ecs_task_policy_arn
   other_region_cidr_blocks  = {
     for region, cidr in var.region_cidr_blocks : region => cidr if region != "us-east-1"
   }
@@ -101,6 +105,8 @@ module "us-west-1" {
   region                    = "us-west-1"
   organisation              = var.organisation
   primary                   = false
+  task_role_arn             = module.global.ecs_task_role_arn
+  task_policy_arn           = module.global.ecs_task_policy_arn
   other_region_cidr_blocks  = {
     for region, cidr in var.region_cidr_blocks : region => cidr if region != "us-west-1"
   }
@@ -177,5 +183,58 @@ resource "aws_ec2_transit_gateway_peering_attachment_accepter" "us_west_1_to_us_
     Name = "${var.organisation}-tgw-peering-accepter-us-west-1-to-us-east-1"
   }
 }
+locals {
+  all_regions = ["eu-west-2", "us-east-1", "us-west-1"]
+  vpc_ids = {
+    "eu-west-2" = module.eu-west-2.vpc_id
+    "us-east-1" = module.us-east-1.vpc_id
+    "us-west-1" = module.us-west-1.vpc_id
+  }
+  hosted_zone_ids = {
+    "eu-west-2" = module.eu-west-2.qdrant_hosted_zone_id
+    "us-east-1" = module.us-east-1.qdrant_hosted_zone_id
+    "us-west-1" = module.us-west-1.qdrant_hosted_zone_id
+  }
+  cross_region_associations = {
+    for pair in setproduct(local.all_regions, local.all_regions) : "${pair[0]}-${pair[1]}" => {
+      source_region = pair[0]
+      target_region = pair[1]
+    } if pair[0] != pair[1]
+  }
+}
 
+resource "aws_route53_zone_association" "cross_region_eu_west_2" {
+  for_each = {
+    for k, v in local.cross_region_associations : k => v
+    if v.target_region == "eu-west-2"
+  }
+
+  provider = aws.eu-west-2
+  vpc_id   = local.vpc_ids["eu-west-2"]
+  zone_id  = local.hosted_zone_ids[each.value.source_region]
+}
+
+resource "aws_route53_zone_association" "cross_region_us_east_1" {
+  for_each = {
+    for k, v in local.cross_region_associations : k => v
+    if v.target_region == "us-east-1"
+  }
+
+  provider = aws.us-east-1
+  vpc_id   = local.vpc_ids["us-east-1"]
+  zone_id  = local.hosted_zone_ids[each.value.source_region]
+}
+
+resource "aws_route53_zone_association" "cross_region_us_west_1" {
+  for_each = {
+    for k, v in local.cross_region_associations : k => v
+    if v.target_region == "us-west-1"
+  }
+
+  provider = aws.us-west-1
+  vpc_id   = local.vpc_ids["us-west-1"]
+  zone_id  = local.hosted_zone_ids[each.value.source_region]
+}
 data "aws_caller_identity" "current" {}
+
+

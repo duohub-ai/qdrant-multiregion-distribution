@@ -44,3 +44,19 @@ resource "aws_ec2_tag" "tgw_route_table_name" {
   key         = "Name"
   value       = "${var.organisation}-tgw-rt-${var.region}"
 }
+
+resource "time_sleep" "wait_for_tgw_peering_acceptance" {
+  depends_on = [var.tgw_peering_attachment_ids]
+
+  create_duration = "2m"
+}
+
+resource "aws_ec2_transit_gateway_route" "tgw_routes" {
+  for_each = var.other_region_cidr_blocks
+
+  depends_on = [aws_ec2_transit_gateway_vpc_attachment.tgw_attachment]
+
+  destination_cidr_block         = each.value
+  transit_gateway_attachment_id  = var.tgw_peering_attachment_ids[each.key]
+  transit_gateway_route_table_id = data.aws_ec2_transit_gateway_route_table.default.id
+}

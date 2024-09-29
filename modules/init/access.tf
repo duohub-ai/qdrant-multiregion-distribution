@@ -39,33 +39,12 @@ output "terraform_access_key_secret" {
 
 data "aws_iam_policy_document" "role-trust-policy" {
   statement {
-    actions = [
-      "sts:AssumeRole",
-      "sts:TagSession"
-    ]
-    effect = "Allow"
-
-    principals {
-      type = "AWS"
-      identifiers = [
-        aws_iam_user.terraform.arn,
-      ]
-    }
-  }
-
-  statement {
-    actions = ["sts:AssumeRole"]
+    actions = ["sts:AssumeRole", "sts:TagSession"]
     effect  = "Allow"
 
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:root"]
-    }
-
-    condition {
-      test     = "StringLike"
-      variable = "aws:PrincipalArn"
-      values   = ["arn:aws:iam::${data.aws_caller_identity.current.account_id}:role/aws-reserved/sso.amazonaws.com/*"]
+      identifiers = ["*"]
     }
   }
 }
@@ -86,4 +65,57 @@ data "aws_iam_policy" "AdministratorAccess" {
 resource "aws_iam_role_policy_attachment" "assumed_role_admin" {
   role       = aws_iam_role.assumed_role.name
   policy_arn = data.aws_iam_policy.AdministratorAccess.arn
+}
+
+data "aws_iam_policy_document" "route53_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "route53:*",
+      "ec2:DescribeVpcs",
+      "ec2:DescribeRegions"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "route53_policy" {
+  name        = "${var.organisation}-route53-policy-${var.stage}"
+  description = "IAM policy for Route 53 permissions"
+  policy      = data.aws_iam_policy_document.route53_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "assumed_role_route53" {
+  role       = aws_iam_role.assumed_role.name
+  policy_arn = aws_iam_policy.route53_policy.arn
+}
+
+data "aws_iam_policy_document" "ec2_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "ec2:DescribeVpcs",
+      "ec2:DescribeRegions"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "ec2_policy" {
+  name        = "${var.organisation}-ec2-policy-${var.stage}"
+  description = "IAM policy for EC2 permissions"
+  policy      = data.aws_iam_policy_document.ec2_permissions.json
+}
+
+resource "aws_iam_role_policy_attachment" "assumed_role_ec2" {
+  role       = aws_iam_role.assumed_role.name
+  policy_arn = aws_iam_policy.ec2_policy.arn
+}
+
+output "assumed_role_name" {
+  value = aws_iam_role.assumed_role.name
+}
+
+output "assumed_role_unique_id" {
+  value = aws_iam_role.assumed_role.unique_id
 }
