@@ -59,3 +59,9 @@ variable "task_policy_arn" {
   description = "ARN of the task policy"
   type        = string
 }
+
+variable "cross_region_hosted_zone_ids" {
+  type        = map(string)
+  description = "Map of cross-region hosted zone IDs to associate with this VPC"
+  default     = {}
+}
