@@ -1,8 +1,8 @@
 
 locals {
-  account     = "488432361986"
+  account     = "AWS_ACCOUNT_ID"
   domain_name = "duohub.ai" 
-  profile     =  "hai"
+  profile     =  "AWS_PROFILE_NAME"
   all_regions = ["eu-west-2", "us-east-1", "us-west-1"]
   vpc_ids = {
     "eu-west-2" = module.eu-west-2.vpc_id

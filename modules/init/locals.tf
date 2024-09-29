@@ -1,4 +1,4 @@
 
 locals {
-  profile = "hai"
+  profile = "AWS_PROFILE_NAME"
 }

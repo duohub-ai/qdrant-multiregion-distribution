@@ -12,7 +12,7 @@ variable "custom_tags" {
 variable "allowed_account_ids" {
   description = "List of allowed AWS account IDs"
   type        = list(string)
-  default     = ["488432361986"]
+  default     = ["AWS_ACCOUNT_ID"]
 }
 
 variable "organisation" {
