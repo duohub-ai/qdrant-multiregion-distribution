@@ -2,6 +2,7 @@
 module "global" {
   source                 = "./modules/global"
   stage                  = var.stage
+  organisation           = var.organisation
 }
 
 data "aws_s3_bucket" "state_bucket" {
