@@ -26,17 +26,7 @@ variable "task_role_arn" {
 }
 
 variable "execution_role_arn" {
-  description = "The ARN of the IAM role that allows ECS to pull container images and publish logs to CloudWatch"
-  type        = string
-}
-
-variable "namespace" {
-  description = "The namespace for the Service Discovery private DNS"
-  type        = string
-}
-
-variable "service_discovery_name" {
-  description = "The name for the Service Discovery service"
+  description = "The ARN of the IAM role that the ECS task will assume"
   type        = string
 }
 
@@ -44,4 +34,31 @@ variable "organisation" {
   description = "The organisation name"
   type        = string
   default     = "qdrant-test"
+}
+
+variable "service_discovery_service_arn" {
+  description = "The ARN of the Service Discovery service"
+  type        = string
+}
+
+variable "service_discovery_name" {
+  description = "The name of the service discovery service"
+  type        = string
+}
+
+variable "namespace_name" {
+  description = "The name of the service discovery namespace"
+  type        = string
+}
+
+variable "primary_service_discovery_name" {
+  description = "The name of the primary region's service discovery service"
+  type        = string
+  default     = "qdrant-test-service-eu-west-2"
+}
+
+variable "primary_namespace_name" {
+  description = "The name of the primary region's service discovery namespace"
+  type        = string
+  default     = "qdrant-test.eu-west-2.internal"
 }

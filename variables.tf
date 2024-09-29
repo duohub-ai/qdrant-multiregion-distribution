@@ -26,3 +26,9 @@ variable "region_cidr_blocks" {
   }
   description = "Predefined CIDR blocks for each region's VPC"
 }
+
+variable "first_create" {
+  description = "Whether this is the first region to be created"
+  type        = bool
+  default     = false
+}

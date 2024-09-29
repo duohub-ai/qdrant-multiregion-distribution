@@ -1,4 +1,5 @@
 # modules/regional/main.tf
+
 terraform {
   required_providers {
     aws = {
@@ -29,12 +30,7 @@ module "network" {
   route_table_name = "${var.organisation}-route-table"
   ecs_sg_name = "allow_all_outbound_inbound"
   region_cidr_blocks = var.region_cidr_blocks
-  tgw_routes = [
-    for region, cidr in var.other_region_cidr_blocks : {
-      destination_cidr_block = cidr
-      transit_gateway_id     = module.transit_gateway.transit_gateway_id
-    }
-  ]
+  transit_gateway_id = module.transit_gateway.transit_gateway_id
 }
 
 module "transit_gateway" {
@@ -43,20 +39,39 @@ module "transit_gateway" {
   organisation = var.organisation
   vpc_id       = module.network.vpc_id
   subnet_ids   = module.network.subnet_ids
-  other_region_cidr_blocks     = var.other_region_cidr_blocks
   tgw_peering_attachment_ids   = var.tgw_peering_attachment_ids
+  first_create = var.first_create
+  region_cidr_blocks = var.region_cidr_blocks
 }
 
- module "qdrant" {
-   source = "./modules/qdrant"
- 
-   region                  = var.region
-   organisation            = var.organisation
-   vpc_id                  = data.aws_vpc.selected.id
-   subnet_ids              = module.network.subnet_ids
-   security_group_id       = data.aws_security_group.security-group.id
-   task_role_arn           = var.task_role_arn
-   execution_role_arn      = var.task_policy_arn
-   namespace               = "qdrant-${var.region}"
-   service_discovery_name  = "qdrant-${var.region}"
- }
+module "namespace" {
+  source       = "./modules/namespace"
+  organisation = var.organisation
+  region       = var.region
+}
+
+module "service_discovery_qdrant" {
+  source         = "./modules/service-discovery"
+  organisation   = var.organisation
+  region         = var.region
+  namespace_id = module.namespace.namespace_id
+  service_name = "${var.organisation}-qdrant-${var.region}"
+}
+
+module "qdrant" {
+  source = "./modules/qdrant"
+  count = var.first_create ? 0 : 1
+  region                        = var.region
+  organisation                  = var.organisation
+  vpc_id                        = module.network.vpc_id
+  subnet_ids                    = module.network.subnet_ids
+  security_group_id             = data.aws_security_group.security-group.id
+  task_role_arn                 = var.task_role_arn
+  execution_role_arn            = var.task_role_arn
+  service_discovery_service_arn = module.service_discovery_qdrant.service_arn
+  service_discovery_name        = module.service_discovery_qdrant.service_name
+  namespace_name                = module.namespace.namespace_name
+  primary_service_discovery_name = "qdrant-test-qdrant-eu-west-2"
+  primary_namespace_name        = "qdrant-test.eu-west-2.internal"
+}
+

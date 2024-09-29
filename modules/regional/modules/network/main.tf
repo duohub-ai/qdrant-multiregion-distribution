@@ -1,4 +1,5 @@
 # modules/regional/modules/network/main.tf
+
 data "aws_vpc" "selected" {
   filter {
     name   = "tag:Name"
@@ -35,7 +36,7 @@ resource "aws_route_table" "main" {
   }
 
   dynamic "route" {
-    for_each = var.tgw_routes
+    for_each = local.tgw_routes
     content {
       cidr_block         = route.value.destination_cidr_block
       transit_gateway_id = route.value.transit_gateway_id
@@ -59,3 +60,12 @@ data "aws_security_group" "ecs_service" {
 }
 
 data "aws_availability_zones" "available" {}
+
+locals {
+  tgw_routes = [
+    for region, cidr in var.region_cidr_blocks : {
+      destination_cidr_block = cidr
+      transit_gateway_id     = var.transit_gateway_id
+    } if region != var.region
+  ]
+}

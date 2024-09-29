@@ -15,7 +15,7 @@ resource "aws_ecs_task_definition" "qdrant" {
   cpu                      = "1024"
   memory                   = "5120"
   task_role_arn            = var.task_role_arn
-  execution_role_arn       = var.task_role_arn
+  execution_role_arn       = var.execution_role_arn
 
   container_definitions = jsonencode([
     {
@@ -39,7 +39,7 @@ resource "aws_ecs_task_definition" "qdrant" {
         }
       ]
       essential = true
-      command   = var.region == "eu-west-2" ? ["./qdrant", "--uri", "http://${var.service_discovery_name}.${var.namespace}:6335"] : ["./qdrant", "--bootstrap", "http://qdrant-eu-west-2.qdrant-eu-west-2:6335"]
+      command   = var.region == "eu-west-2" ? ["./qdrant", "--uri", "http://${var.service_discovery_name}.${var.namespace_name}:6335"] : ["./qdrant", "--bootstrap", "http://${var.primary_service_discovery_name}.${var.primary_namespace_name}:6335"]
       environment = concat([
         {
           name  = "QDRANT__CLUSTER__ENABLED"
@@ -84,29 +84,7 @@ resource "aws_ecs_service" "qdrant" {
   }
 
   service_registries {
-    registry_arn = aws_service_discovery_service.qdrant.arn
-  }
-}
-
-resource "aws_service_discovery_private_dns_namespace" "qdrant" {
-  name        = var.namespace
-  description = "Namespace for Qdrant service discovery"
-  vpc         = var.vpc_id
-}
-
-resource "aws_service_discovery_service" "qdrant" {
-  name = var.service_discovery_name
-
-  dns_config {
-    namespace_id = aws_service_discovery_private_dns_namespace.qdrant.id
-    dns_records {
-      ttl  = 15
-      type = "A"
-    }
-  }
-
-  health_check_custom_config {
-    failure_threshold = 1
+    registry_arn = var.service_discovery_service_arn
   }
 }
 

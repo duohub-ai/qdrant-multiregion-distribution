@@ -36,16 +36,17 @@ variable "region" {
   type        = string
 }
 
-variable "tgw_routes" {
-  description = "List of routes to add to the route table for Transit Gateway"
-  type = list(object({
-    destination_cidr_block = string
-    transit_gateway_id     = string
-  }))
-  default = []
+variable "transit_gateway_id" {
+  type        = string
+  description = "ID of the Transit Gateway"
 }
 
 variable "region_cidr_blocks" {
   type = map(string)
-  description = "CIDR blocks for each region's VPC"
+  default = {
+    us-east-1      = "10.0.0.0/16"
+    us-west-1      = "10.1.0.0/16"
+    eu-west-2      = "10.3.0.0/16"
+  }
+  description = "Predefined CIDR blocks for each region's VPC"
 }
