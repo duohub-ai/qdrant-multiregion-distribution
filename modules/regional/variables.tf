@@ -1,26 +1,10 @@
 # modules/regional/variables.tf
-variable "stage" {
-  type    = string
-  default = "dev"
-}
-
-
 
 variable "region" {
   description = "AWS Region"
   type        = string
 }
 
-variable "desired_count" {
-  description = "The desired number of ECS tasks for each service"
-  default     = 1
-}
-
-variable "primary" {
-  description = "Whether this region hosts the primary clusters"
-  type        = bool
-  default     = false
-}
 
 variable "organisation" {
   description = "The organisation name"
@@ -38,13 +22,6 @@ variable "region_cidr_blocks" {
   description = "CIDR blocks for each region's VPC"
 }
 
-
-variable "other_region_cidr_blocks" {
-  description = "Map of other regions' CIDR blocks"
-  type        = map(string)
-  default     = {}
-}
-
 variable "tgw_peering_attachment_ids" {
   description = "Map of region names to their TGW peering attachment IDs"
   type        = map(string)
@@ -60,8 +37,8 @@ variable "task_policy_arn" {
   type        = string
 }
 
-variable "cross_region_hosted_zone_ids" {
-  type        = map(string)
-  description = "Map of cross-region hosted zone IDs to associate with this VPC"
-  default     = {}
+variable "first_create" {
+  description = "Whether this is the first region to be created"
+  type        = bool
+  default     = false
 }

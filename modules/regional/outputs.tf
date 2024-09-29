@@ -27,12 +27,12 @@ output "hosted_zone_id" {
   description = "The ID of the hosted zone created by the service discovery namespace"
 }
 
-output "service_id" {
-  value       = module.service_discovery.service_id
+output "qdrant_service_id" {
+  value       = module.service_discovery_qdrant.service_id
   description = "The ID of the service discovery service"
 }
 
-output "service_arn" {
-  value       = module.service_discovery.service_arn
+output "qdrant_service_arn" {
+  value       = module.service_discovery_qdrant.service_arn
   description = "The ARN of the service discovery service"
 }

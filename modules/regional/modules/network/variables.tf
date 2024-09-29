@@ -36,15 +36,6 @@ variable "region" {
   type        = string
 }
 
-variable "tgw_routes" {
-  description = "List of routes to add to the route table for Transit Gateway"
-  type = list(object({
-    destination_cidr_block = string
-    transit_gateway_id     = string
-  }))
-  default = []
-}
-
 variable "transit_gateway_id" {
   type        = string
   description = "ID of the Transit Gateway"

@@ -38,23 +38,23 @@ data "aws_ec2_transit_gateway_route_table" "default" {
   }
 }
 
-# Add a name tag to the default route table
 resource "aws_ec2_tag" "tgw_route_table_name" {
   resource_id = data.aws_ec2_transit_gateway_route_table.default.id
   key         = "Name"
   value       = "${var.organisation}-tgw-rt-${var.region}"
 }
 
-resource "time_sleep" "wait_for_tgw_peering_acceptance" {
-  depends_on = [var.tgw_peering_attachment_ids]
 
-  create_duration = "2m"
+locals {
+  other_region_cidr_blocks = {
+    for region, cidr in var.region_cidr_blocks :
+    region => cidr
+    if region != var.region
+  }
 }
 
 resource "aws_ec2_transit_gateway_route" "tgw_routes" {
-  for_each = var.other_region_cidr_blocks
-
-  depends_on = [aws_ec2_transit_gateway_vpc_attachment.tgw_attachment]
+  for_each = var.first_create ? {} : local.other_region_cidr_blocks
 
   destination_cidr_block         = each.value
   transit_gateway_attachment_id  = var.tgw_peering_attachment_ids[each.key]

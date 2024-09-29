@@ -63,14 +63,14 @@ module "eu-west-2" {
   source       = "./modules/regional"
   organisation = var.organisation
   region       = "eu-west-2"
-  primary      = true
-  stage        = var.stage
   task_role_arn = module.global.ecs_task_role_arn
   task_policy_arn = module.global.ecs_task_policy_arn
   tgw_peering_attachment_ids = {
     "us-east-1" = aws_ec2_transit_gateway_peering_attachment.eu_west_2_to_us_east_1.id,
     "us-west-1" = aws_ec2_transit_gateway_peering_attachment.eu_west_2_to_us_west_1.id
   }
+  first_create = var.first_create
+  region_cidr_blocks = var.region_cidr_blocks
 }
 
 module "us-east-1" {
@@ -80,14 +80,14 @@ module "us-east-1" {
   source       = "./modules/regional"
   organisation = var.organisation
   region       = "us-east-1"
-  primary      = false
-  stage        = var.stage
   task_role_arn = module.global.ecs_task_role_arn
   task_policy_arn = module.global.ecs_task_policy_arn
   tgw_peering_attachment_ids = {
     "eu-west-2" = aws_ec2_transit_gateway_peering_attachment.eu_west_2_to_us_east_1.id,
     "us-west-1" = aws_ec2_transit_gateway_peering_attachment.us_east_1_to_us_west_1.id
   }
+  first_create = var.first_create
+  region_cidr_blocks = var.region_cidr_blocks
 }
 
 module "us-west-1" {
@@ -97,14 +97,14 @@ module "us-west-1" {
   source       = "./modules/regional"
   organisation = var.organisation
   region       = "us-west-1"
-  primary      = false
-  stage        = var.stage
   task_role_arn = module.global.ecs_task_role_arn
   task_policy_arn = module.global.ecs_task_policy_arn
   tgw_peering_attachment_ids = {
     "eu-west-2" = aws_ec2_transit_gateway_peering_attachment.eu_west_2_to_us_west_1.id,
     "us-east-1" = aws_ec2_transit_gateway_peering_attachment.us_east_1_to_us_west_1.id
   }
+  first_create = var.first_create
+  region_cidr_blocks = var.region_cidr_blocks
 }
 
 

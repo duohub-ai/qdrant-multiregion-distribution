@@ -7,3 +7,8 @@ output "service_arn" {
   value       = aws_service_discovery_service.internal.arn
   description = "The ARN of the service discovery service"
 }
+
+output "service_name" {
+  value       = aws_service_discovery_service.internal.name
+  description = "The name of the service discovery service"
+}

@@ -39,16 +39,9 @@ module "transit_gateway" {
   organisation = var.organisation
   vpc_id       = module.network.vpc_id
   subnet_ids   = module.network.subnet_ids
-  other_region_cidr_blocks     = var.other_region_cidr_blocks
   tgw_peering_attachment_ids   = var.tgw_peering_attachment_ids
-}
-
-module "service_discovery" {
-  source         = "./modules/service-discovery"
-  organisation   = var.organisation
-  region         = var.region
-  namespace_id = module.namespace.namespace_id
-  service_name = "${var.organisation}-service-${var.region}"
+  first_create = var.first_create
+  region_cidr_blocks = var.region_cidr_blocks
 }
 
 module "namespace" {
@@ -57,10 +50,28 @@ module "namespace" {
   region       = var.region
 }
 
-# module "vpc_associations" {
-#   source         = "./modules/vpc-associations"
-#   organisation   = var.organisation
-#   region         = var.region
-#   vpc_ids      = var.vpc_ids
-#   depends_on = [module.namespace, module.transit_gateway, module.service_discovery]
-# }
+module "service_discovery_qdrant" {
+  source         = "./modules/service-discovery"
+  organisation   = var.organisation
+  region         = var.region
+  namespace_id = module.namespace.namespace_id
+  service_name = "${var.organisation}-qdrant-${var.region}"
+}
+
+module "qdrant" {
+  source = "./modules/qdrant"
+  count = var.first_create ? 0 : 1
+  region                        = var.region
+  organisation                  = var.organisation
+  vpc_id                        = module.network.vpc_id
+  subnet_ids                    = module.network.subnet_ids
+  security_group_id             = data.aws_security_group.security-group.id
+  task_role_arn                 = var.task_role_arn
+  execution_role_arn            = var.task_role_arn
+  service_discovery_service_arn = module.service_discovery_qdrant.service_arn
+  service_discovery_name        = module.service_discovery_qdrant.service_name
+  namespace_name                = module.namespace.namespace_name
+  primary_service_discovery_name = "qdrant-test-qdrant-eu-west-2"
+  primary_namespace_name        = "qdrant-test.eu-west-2.internal"
+}
+
