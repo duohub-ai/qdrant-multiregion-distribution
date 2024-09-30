@@ -36,10 +36,10 @@ resource "aws_route_table" "main" {
   }
 
   dynamic "route" {
-    for_each = local.tgw_routes
+    for_each = var.vpc_peering_connection_ids
     content {
-      cidr_block         = route.value.destination_cidr_block
-      transit_gateway_id = route.value.transit_gateway_id
+      cidr_block                = var.region_cidr_blocks[route.key]
+      vpc_peering_connection_id = route.value
     }
   }
 
@@ -60,12 +60,3 @@ data "aws_security_group" "ecs_service" {
 }
 
 data "aws_availability_zones" "available" {}
-
-locals {
-  tgw_routes = [
-    for region, cidr in var.region_cidr_blocks : {
-      destination_cidr_block = cidr
-      transit_gateway_id     = var.transit_gateway_id
-    } if region != var.region
-  ]
-}

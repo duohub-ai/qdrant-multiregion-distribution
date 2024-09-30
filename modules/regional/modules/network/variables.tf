@@ -15,11 +15,6 @@ variable "subnet_name" {
   type        = string
 }
 
-variable "igw_name" {
-  description = "The name of the internet gateway"
-  type        = string
-}
-
 variable "route_table_name" {
   description = "The name of the route table"
   type        = string
@@ -36,11 +31,6 @@ variable "region" {
   type        = string
 }
 
-variable "transit_gateway_id" {
-  type        = string
-  description = "ID of the Transit Gateway"
-}
-
 variable "region_cidr_blocks" {
   type = map(string)
   default = {
@@ -49,4 +39,14 @@ variable "region_cidr_blocks" {
     eu-west-2      = "10.3.0.0/16"
   }
   description = "Predefined CIDR blocks for each region's VPC"
+}
+
+variable "vpc_peering_connection_ids" {
+  description = "Map of region names to VPC peering connection IDs"
+  type        = map(string)
+}
+
+variable "igw_name" {
+  description = "The name of the internet gateway"
+  type        = string
 }
