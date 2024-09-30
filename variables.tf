@@ -32,3 +32,10 @@ variable "first_create" {
   type        = bool
   default     = false
 }
+
+
+variable "vpc_peering_connection_ids" {
+  description = "Map of region names to VPC peering connection IDs"
+  type        = map(string)
+  default     = {}
+}

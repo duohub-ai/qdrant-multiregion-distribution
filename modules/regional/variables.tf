@@ -5,7 +5,6 @@ variable "region" {
   type        = string
 }
 
-
 variable "organisation" {
   description = "The organisation name"
   type        = string
@@ -22,10 +21,6 @@ variable "region_cidr_blocks" {
   description = "CIDR blocks for each region's VPC"
 }
 
-variable "tgw_peering_attachment_ids" {
-  description = "Map of region names to their TGW peering attachment IDs"
-  type        = map(string)
-}
 
 variable "task_role_arn" {
   description = "ARN of the task role"
@@ -41,4 +36,9 @@ variable "first_create" {
   description = "Whether this is the first region to be created"
   type        = bool
   default     = false
+}
+
+variable "vpc_peering_connection_ids" {
+  description = "Map of region names to VPC peering connection IDs"
+  type        = map(string)
 }
