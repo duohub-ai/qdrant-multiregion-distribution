@@ -28,7 +28,7 @@ variable "region_cidr_blocks" {
 }
 
 variable "first_create" {
-  description = "Whether this is the first region to be created"
+  description = "Whether this is the first time you are creating the infrastructure"
   type        = bool
   default     = false
 }
