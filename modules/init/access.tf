@@ -111,11 +111,3 @@ resource "aws_iam_role_policy_attachment" "assumed_role_ec2" {
   role       = aws_iam_role.assumed_role.name
   policy_arn = aws_iam_policy.ec2_policy.arn
 }
-
-output "assumed_role_name" {
-  value = aws_iam_role.assumed_role.name
-}
-
-output "assumed_role_unique_id" {
-  value = aws_iam_role.assumed_role.unique_id
-}
