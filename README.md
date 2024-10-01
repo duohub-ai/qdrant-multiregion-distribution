@@ -59,7 +59,7 @@ Perform a search for the following text and replace them with the correct variab
 
 #### ORGANISATION
 
-The organisation name is used in the naming of resources. You do not need to use this - it is a variable I use to organise my AWS account, though if you do not use it, you will need to update resource names and variables through the repo. 
+The organisation name is used in the naming of resources. You do not need to use this - it is a variable I use to organise my AWS account, though if you do not use it, you will need to update resource names and remove the organisation variables throughout the project. 
 
 #### REGIONS
 
@@ -70,7 +70,7 @@ Perform a search for `region_cidr_blocks`. There are two top-level definitions l
 
 These are independent of each other, but they need to match. 
 
-You will see other results for `region_cidr_blocks` throught the repo - these have default values but have their actual values passed through. 
+You will see other results for `region_cidr_blocks` throughout the project - these have default values but have their actual values passed through. 
 
 ### Create Foundational Infrastructure - Init Module
 
