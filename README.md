@@ -99,7 +99,7 @@ role_arn       = "arn:aws:iam::AWS_ACCOUNT_ID:role/qdrant-test-terraform-assumed
 Go back to the root of the repo and run the following commands: 
 
 ```bash
-terraform init -backend-config-backend.conf
+terraform init -backend-config=backend.conf
 terraform plan -var="stage=dev" -var="first_create=true"
 terraform apply -var="stage=dev" -var="first_create=true"
 ```
@@ -139,7 +139,7 @@ module "qdrant" {
 
 You may find yourself in a position where you need to add additional services to your clusters that use the same regional private DNS namespace. 
 
-If this is the case, you can define multiple `service_discovery_$[name}` modules in `/modules/regional/main.tf`, for example: 
+If this is the case, you can define multiple `service_discovery_${name}` modules in `/modules/regional/main.tf`, for example: 
 
 ```hcl 
 module "service_discovery_qdrant" {
