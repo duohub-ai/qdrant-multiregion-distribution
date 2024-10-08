@@ -85,8 +85,7 @@ resource "aws_ecs_service" "qdrant" {
 
   service_registries {
     registry_arn   = var.service_discovery_service_arn
-    container_name = "qdrant-container"
-    container_port = 6333
+
   }
 }
 
