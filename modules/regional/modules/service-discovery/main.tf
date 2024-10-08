@@ -15,7 +15,7 @@ resource "aws_service_discovery_service" "internal" {
 
     dns_records {
       ttl  = 10
-      type = "SRV"
+      type = "A"
     }
 
     routing_policy = "MULTIVALUE"
